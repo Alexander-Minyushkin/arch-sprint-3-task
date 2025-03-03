@@ -1,0 +1,14 @@
+@startuml
+
+!include <C4/C4_Context>
+
+Person(user, "User")
+System_Ext(house, "Heaters and sensors")
+
+System(sh, "Smart House")
+
+Rel(user, sh, "sync API requests")
+Rel(sh, house, "sync API requests")
+
+
+@enduml
