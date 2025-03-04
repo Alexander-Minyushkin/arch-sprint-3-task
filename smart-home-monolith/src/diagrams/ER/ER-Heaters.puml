@@ -7,15 +7,9 @@ top to bottom direction
 !include <C4/C4_Component>
 left to right direction
 
-entity User {
-    *id : int PK
-    name : varchar
-    email : varchar
-}
-
 entity House {
     *id : int PK
-    user_id : int FK >-- User.id
+    user_id : int 
     address : varchar
 }
 
@@ -46,7 +40,6 @@ entity TelemetryData {
 House ||--o{  Device 
 Device ||--||  DeviceType
 Device ||--o{  TelemetryData
-House ||--||  User
 
 
 @enduml
