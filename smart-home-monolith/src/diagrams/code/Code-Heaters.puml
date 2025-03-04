@@ -1,0 +1,99 @@
+@startuml
+title Heaters Code Diagram
+
+top to bottom direction
+
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+!include <C4/C4_Component>
+
+System_Boundary(heaters_system, "Heaters System") {
+
+    package "Controller Layer" {
+        class APIController {
+            + getStatus()
+            + getHistory()
+            - heaterService: HeaterService
+        }
+    }
+
+    package "Consumer Layer" {
+        interface KafkaConsumer {
+            + consume()
+        }
+
+        class CommandConsumer implements KafkaConsumer {
+            - heaterService: HeaterService
+            + consumeCommand()
+        }
+
+        class DataConsumer implements KafkaConsumer {
+            - heaterService: HeaterService
+            + consumeData()
+        }
+    }
+
+    package "Service Layer" {
+        interface HeaterService {
+            + processCommand(command: Command)
+            + updateStatus(data: HeaterData)
+            + getHistory(): List<CommandStatus>
+        }
+
+        class DefaultHeaterService implements HeaterService {
+            - dbRepository: DBRepository
+            + processCommand(command: Command)
+            + updateStatus(data: HeaterData)
+            + getHistory(): List<CommandStatus>
+        }
+    }
+
+    package "Repository Layer" {
+        interface DBRepository {
+            + saveCommand(command: Command)
+            + saveStatus(status: HeaterStatus)
+            + getHistory(): List<CommandStatus>
+        }
+
+        class PostgreSQLRepository implements DBRepository {
+            + saveCommand(command: Command)
+            + saveStatus(status: HeaterStatus)
+            + getHistory(): List<CommandStatus>
+        }
+    }
+
+    package "Domain Model" {
+        class Command {
+            - id: String
+            - action: String
+            - gadget_id: String
+            - timestamp: Date
+        }
+
+        class HeaterData {
+            - id: String
+            - temperature: Double
+            - timestamp: Date
+        }
+
+        class HeaterStatus {
+            - id: String
+            - status: String
+            - timestamp: Date
+        }
+
+        class CommandStatus {
+            - id: String
+            - command: Command
+            - timestamp: Date
+        }
+    }
+
+
+    APIController --> HeaterService: uses
+    CommandConsumer --> HeaterService: uses
+    DataConsumer --> HeaterService: uses
+    DefaultHeaterService --> DBRepository: uses
+    PostgreSQLRepository --> "PostgreSQL Database": interacts with
+}
+
+@enduml

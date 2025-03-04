@@ -1,0 +1,41 @@
+@startuml
+
+title Heaters Components Diagram
+
+!include <C4/C4_Component>
+
+System(api_gateway, "API Gateway")
+
+System_Boundary(queue_system, "Queue(Kafka)"){
+    ContainerQueue(command_topic, "Geater Command topic")
+    ContainerQueue(data_topic, "Heater Data topic")
+}
+
+System_Boundary(heaters_system, "Heaters"){
+
+    Container(api, "read API")
+    Container(command, "Command consumer")
+    Container(data, "Data Consumer")
+
+    ContainerDb(db, "Command and Status updates history")
+}
+
+
+System_Ext(house, "Heaters")
+
+Rel(api_gateway, command_topic, "")
+Rel(api_gateway, api, "")
+
+Rel(command_topic, command, "")
+Rel(data_topic, data, "")
+
+
+Rel(api, db,"")
+Rel(command, db,"")
+Rel(command, house,"")
+
+Rel(data, db, "")
+Rel(house, data_topic, "")
+
+
+@enduml
