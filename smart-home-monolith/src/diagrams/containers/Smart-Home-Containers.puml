@@ -1,0 +1,71 @@
+@startuml
+
+!include <C4/C4_Container>
+
+Person(user, "API User")
+Person(admin, "API Admin")
+
+System_Boundary(sh, "Smart House"){
+    Container(api_gateway,"API Gateway", "Kong")
+    ContainerQueue(queue, "Queue", "Kafka")
+
+    Container(heaters_back, "Heaters", "Java")
+    ContainerDb(heaters_db, "Heaters DB", "Postgres")
+
+    Container(thermal_back, "Thermal monitoring", "Java")
+    ContainerDb(thermal_db, "Thermal DB", "Postgres")
+
+    Container(ligths_back, "Lights", "Java")
+    ContainerDb(ligths_db, "Lights DB", "Postgres")
+
+    Container(gates_back, "Gates", "Java")
+    ContainerDb(gates_db, "Gates DB", "Postgres")
+
+    Container(video_back, "Video Monitoring", "Java")
+    ContainerDb(video_db, "Video Monitoring DB", "Postgres")
+
+    Container(user_back, "User Management", "Java")
+    ContainerDb(user_db, "User Management DB", "Postgres")
+}
+
+System_Ext(house, "All in-house gadgets")
+
+Lay_D(sh, house)
+
+Rel(user, api_gateway, "sync API")
+Rel(admin, api_gateway, "sync API")
+
+Rel(api_gateway, queue, "async\nwrite")
+Rel(house, queue, "async\nstatus updates")
+
+Rel(api_gateway, heaters_back, "sync\nread")
+Rel(api_gateway, thermal_back, "sync\nread")
+Rel(api_gateway, ligths_back, "sync\nread")
+Rel(api_gateway, gates_back, "sync\nread")
+Rel(api_gateway, video_back, "sync\nread")
+
+Rel(api_gateway, user_back, "sync\nread/write")
+
+Rel(queue, heaters_back, "async\nwrite")
+Rel(queue, thermal_back, "async\nwrite")
+Rel(queue, ligths_back, "async\nwrite")
+Rel(queue, gates_back, "async\nwrite")
+Rel(queue, video_back, "async\nwrite")
+
+
+Rel(heaters_back, heaters_db, "")
+Rel(thermal_back, thermal_db,"")
+Rel(ligths_back, ligths_db,"")
+Rel(gates_back, gates_db,"")
+Rel(video_back, video_db, "")
+Rel(user_back, user_db, "")
+
+Rel(heaters_back, house, "")
+Rel(thermal_back, house,"")
+Rel(ligths_back, house,"")
+Rel(gates_back, house,"")
+Rel(video_back, house, "")
+
+
+
+@enduml
