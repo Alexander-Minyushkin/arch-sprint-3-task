@@ -1,0 +1,52 @@
+@startuml
+title Heaters ER Diagram
+
+top to bottom direction
+
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+!include <C4/C4_Component>
+left to right direction
+
+entity User {
+    *id : int PK
+    name : varchar
+    email : varchar
+}
+
+entity House {
+    *id : int PK
+    user_id : int FK >-- User.id
+    address : varchar
+}
+
+entity Device {
+    *id : int PK
+    house_id : int FK >-- House.id
+    type_id : int FK >-- DeviceType.id
+    serial_number : varchar
+    status : boolean
+}
+
+entity DeviceType {
+    *id : int PK
+    name : varchar
+    description : text
+}
+
+
+entity TelemetryData {
+    *id : int PK
+    device_id : int FK >-- Device.id
+    timestamp : datetime
+    type: varchar
+    value : float
+}
+
+
+House ||--o{  Device 
+Device ||--||  DeviceType
+Device ||--o{  TelemetryData
+House ||--||  User
+
+
+@enduml
